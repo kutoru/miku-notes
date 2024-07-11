@@ -1,0 +1,84 @@
+services:
+
+  redis:
+    image: redis/redis-stack-server:latest
+    ports:
+      - 6379:6379
+
+  db:
+    image: postgres:16
+    user: ${DB_USER}
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+    volumes:
+      - app-volume:/usr/db
+    ports:
+      - 5432:5432
+
+  auth-service:
+    depends_on:
+      - redis
+      - db
+    build: ./miku-notes-auth
+    environment:
+      ENV: ${AUTH_SERVICE_ENV}
+
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASS}
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME}
+      DB_SSLMODE: disable
+
+      ACCESS_TTL: ${ACCESS_TOKEN_TTL}s
+      REFRESH_TTL: ${REFRESH_TOKEN_TTL}s
+      REDIS_ADDR: redis:6379
+      SECRET: ${AUTH_SERVICE_SECRET}
+
+      PORT: ${AUTH_SERVICE_PORT}
+      CONNECTION_TOKEN: ${AUTH_SERVICE_TOKEN}
+    ports:
+      - ${AUTH_SERVICE_PORT}:${AUTH_SERVICE_PORT}
+
+  data-service:
+    depends_on:
+      - db
+    build: ./miku-notes-data
+    environment:
+      DB_URL: postgres://${DB_USER}:${DB_PASS}@db/${DB_NAME}?schema=public
+      SERVICE_PORT: ${DATA_SERVICE_PORT}
+      SERVICE_TOKEN: ${DATA_SERVICE_TOKEN}
+      MAX_FILE_CHUNK_SIZE: ${MAX_FILE_CHUNK_SIZE}
+    volumes:
+      - app-volume:/usr/files
+    ports:
+      - ${DATA_SERVICE_PORT}:${DATA_SERVICE_PORT}
+
+  gateway-service:
+    depends_on:
+      - auth-service
+      - data-service
+    build: ./miku-notes-gateway
+    environment:
+      LOG_LEVEL: ${GATEWAY_SERVICE_LOG_LEVEL}
+      SERVICE_PORT: ${GATEWAY_SERVICE_PORT}
+      FRONTEND_URL: ${FRONTEND_URL}
+      MAX_REQUEST_BODY_SIZE: ${MAX_REQUEST_BODY_SIZE}
+      MAX_FILE_CHUNK_SIZE: ${MAX_FILE_CHUNK_SIZE}
+
+      AUTH_URL: auth-service:${AUTH_SERVICE_PORT}
+      DATA_URL: data-service:${DATA_SERVICE_PORT}
+      AUTH_TOKEN: ${AUTH_SERVICE_TOKEN}
+      DATA_TOKEN: ${DATA_SERVICE_TOKEN}
+
+      ACCESS_TOKEN_TTL: ${ACCESS_TOKEN_TTL}
+      REFRESH_TOKEN_TTL: ${REFRESH_TOKEN_TTL}
+      ACCESS_TOKEN_KEY: ${ACCESS_TOKEN_KEY}
+      REFRESH_TOKEN_KEY: ${REFRESH_TOKEN_KEY}
+    ports:
+      - ${GATEWAY_SERVICE_PORT}:${GATEWAY_SERVICE_PORT}
+
+volumes:
+  app-volume:

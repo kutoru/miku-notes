@@ -1,0 +1,12 @@
+[submodule "miku-notes-auth"]
+	path = miku-notes-auth
+	url = https://github.com/kuromii5/miku-notes-auth
+[submodule "miku-notes-data"]
+	path = miku-notes-data
+	url = https://github.com/kutoru/miku-notes-data
+[submodule "miku-notes-gateway"]
+	path = miku-notes-gateway
+	url = https://github.com/kutoru/miku-notes-gateway
+[submodule "miku-notes-frontend"]
+	path = miku-notes-frontend
+	url = https://github.com/kinokorain/miku-notes-frontend
