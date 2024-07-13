@@ -29,6 +29,7 @@ services:
       db:
         condition: service_healthy
     build: ./miku-notes-auth
+    stop_grace_period: 1s
     healthcheck:
       test: bash -c 'if [ "$$(curl --fail --http2-prior-knowledge -w ''%{http_code}'' http://localhost:${AUTH_SERVICE_PORT})" == "415" ]; then exit 0; else exit 1; fi'
       interval: 5s
@@ -59,10 +60,8 @@ services:
     depends_on:
       auth-service:
         condition: service_healthy
-    build:
-      context: ./miku-notes-data
-      args:
-        - SERVICE_PORT=${DATA_SERVICE_PORT}
+    build: ./miku-notes-data
+    stop_grace_period: 1s
     healthcheck:
       test: curl --fail --http2-prior-knowledge http://localhost:${DATA_SERVICE_PORT} || exit 1
       interval: 5s
@@ -84,6 +83,7 @@ services:
       data-service:
         condition: service_healthy
     build: ./miku-notes-gateway
+    stop_grace_period: 1s
     environment:
       LOG_LEVEL: ${GATEWAY_SERVICE_LOG_LEVEL}
       SERVICE_PORT: ${GATEWAY_SERVICE_PORT}
