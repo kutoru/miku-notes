@@ -2,6 +2,8 @@ services:
 
   redis:
     image: redis:latest
+    volumes:
+      - app-volume:/data
     ports:
       - 6379:6379
 
@@ -17,8 +19,8 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_DB=${DB_NAME}
-    # volumes:
-      # - app-volume:/usr/db
+    volumes:
+      - app-volume:/var/lib/postgresql/data
     ports:
       - 5432:5432
 
@@ -73,8 +75,8 @@ services:
       SERVICE_PORT: ${DATA_SERVICE_PORT}
       SERVICE_TOKEN: ${DATA_SERVICE_TOKEN}
       MAX_FILE_CHUNK_SIZE: ${MAX_FILE_CHUNK_SIZE}
-    # volumes:
-    #   - app-volume:/usr/files
+    volumes:
+      - app-volume:/usr/src/miku-notes-data/files
     ports:
       - ${DATA_SERVICE_PORT}:${DATA_SERVICE_PORT}
 
@@ -103,6 +105,6 @@ services:
     ports:
       - ${GATEWAY_SERVICE_PORT}:${GATEWAY_SERVICE_PORT}
 
-# volumes:
-#   app-volume:
-#     name: "miku-notes-volume"
+volumes:
+  app-volume:
+    name: miku-notes-volume
