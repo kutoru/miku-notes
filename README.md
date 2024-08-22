@@ -21,11 +21,11 @@ This app consists of five main parts, three microservices and two frontends:
 
 # How to run it locally?
 
-The best way to run the app is with Docker by using `docker compose up` in the root directory. If you are using the default [configuration](#env), then after successful launch, the app's API should be available at `http://localhost:3030`. **Note** that since the frontends aren't yet fully functional, the only way to properly try out this app is through its API. The API's documentation should be available at `http://localhost:3030/swagger-ui`.
+The best way to run the app is with Docker by using `docker compose up` in the root directory. If you are using the default [configuration](#env), then after successful launch, the app's API should be available at `http://localhost:3030`. **Note** that since the **Frontend** isn't yet fully functional, the only ways to interact with the app is through either its Android client or the API. The API's documentation should be available at `http://localhost:3030/swagger-ui`.
 
 You could also run the services manually without Docker. To do so, you should go into each service's repository and explore the readmes there.
 
-To run the Android application, visit its [releases](https://github.com/kutoru/miku-notes-android/releases), download and install the latest one. Alternatively, you could also clone the repo and build the APK yourself.
+To run the Android client, visit its [releases](https://github.com/kutoru/miku-notes-android/releases), download and install the latest one. Alternatively, you could also clone the repo and build the APK yourself.
 
 # .env
 
